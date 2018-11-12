@@ -19,7 +19,10 @@
     }
   },
   "lint-staged": {
-    "*.js": ["eslint", "git add"]
+    "*.js": [
+      "eslint",
+      "git add"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -27,6 +30,8 @@
   "homepage": "https://bitbucket.org/artemmaks/railil#readme",
   "dependencies": {
     "dotenv": "^6.1.0",
+    "axios": "^0.18.0",
+    "moment": "^2.22.2",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const TelegramBot = require('node-telegram-bot-api');
+const api = require('../api/');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.BOT_TOKEN;
@@ -9,16 +10,15 @@ const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, {polling: true});
 
 // Matches "/echo [whatever]"
-bot.onText(/\/echo (.+)/, (msg, match) => {
-    // 'msg' is the received Message from Telegram
-    // 'match' is the result of executing the regexp above on the text content
-    // of the message
-
+bot.onText(/домой/i, async (msg) => {
     const chatId = msg.chat.id;
-    const resp = match[1]; // the captured "whatever"
-
-    // send back the matched "whatever" to the chat
-    bot.sendMessage(chatId, resp);
+    bot.sendMessage(chatId, 'Работаю...');
+    const trains = await api.getTrainsHomeForNow(Date.now());
+    if(trains.length > 0){
+        bot.sendMessage(chatId, `* ${trains.splice(0,5).join("\n* ")}`);
+    }else{
+        bot.sendMessage(chatId, 'Чет не нашел ничего :(');
+    }
 });
 
 // Listen for any kind of message. There are different kinds of
