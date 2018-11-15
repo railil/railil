@@ -2,9 +2,10 @@
   "name": "railil",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "bot/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bot/index.js"
   },
   "repository": {
     "type": "git",
@@ -29,8 +30,8 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/artemmaks/railil#readme",
   "dependencies": {
-    "dotenv": "^6.1.0",
     "axios": "^0.18.0",
+    "dotenv": "^6.1.0",
     "moment": "^2.22.2",
     "node-telegram-bot-api": "^0.30.0"
   },
