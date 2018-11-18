@@ -36,12 +36,12 @@ const getAllStations = async () => {
     }
 
     try {
-        const {data} = await axios.get(getAllStationsUrl());
+        const {data} = await axios.get(getAllStationsUrl);
 
         allStations = data.station;
 
     } catch (e) {
-        allStations = {};
+        allStations = null;
     }
 
     return allStations;

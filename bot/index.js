@@ -31,7 +31,7 @@ bot.onText(/домой/i, async (msg) => {
 
     if (trains.length > 0) {
         bot.sendMessage(chatId,
-            `из ${allStations[fromStation]} в ${allStations[toStation]}` +
+            (allStations && `из ${allStations[fromStation]} в ${allStations[toStation]}`) +
             '\n' +
             `* ${trains.splice(0, 5).join('\n* ')}`);
     } else {
@@ -52,7 +52,7 @@ bot.onText(/работать/i, async (msg) => {
 
     if (trains.length > 0) {
         bot.sendMessage(chatId,
-            `из ${allStations[fromStation]} в ${allStations[toStation]}` +
+            (allStations && `из ${allStations[fromStation]} в ${allStations[toStation]}`) +
             '\n' +
             `* ${trains.splice(0, 5).join('\n* ')}`);
     } else {
