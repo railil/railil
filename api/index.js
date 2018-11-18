@@ -7,7 +7,7 @@ const axios = require('axios');
 const moment = require('moment');
 
 const getTrainsUrl = ({ fromStation, toStation, date, time }) => `https://www.rail.co.il/apiinfo/api/Plan/GetRoutes?OId=${fromStation}&TId=${toStation}&Date=${date}&Hour=${time}`;
-const getAllStationsUrl = () => 'https://www.rail.co.il/apiinfo/api/translator/get?lang=ru';
+const getAllStationsUrl = 'https://www.rail.co.il/apiinfo/api/translator/get?lang=ru';
 
 let allStations;
 /*
@@ -18,9 +18,12 @@ Example:
 {fromStation:4600,toStation:2100,date:20181108,time:1700}
  */
 const getRawDataFromApi = async ({ fromStation, toStation, date, time }) => {
-    console.log(getTrainsUrl({ fromStation, toStation, date, time }));
-    const { data } = await axios.get(getTrainsUrl({ fromStation, toStation, date, time }));
-    return data;
+    try {
+        const { data } = await axios.get(getTrainsUrl({ fromStation, toStation, date, time }));
+        return data;
+    } catch (e) {
+        throw e;
+    }
 };
 
 const apiDateTimeToMoment = apiDateTime => {
@@ -61,21 +64,4 @@ const getTrainsForNow = async (now, {fromStation, toStation}) => {
     }
 };
 
-/*
-Simple implementation for the command "Home". More like a POC rather than thoughtful method.
- */
-const getTrainsHomeForNow = async now => {
-    const fromStation = 4600; //tel aviv shalom
-    const toStation = 2100; //haifa merkaz ha shmona
-
-    return getTrainsForNow(now, {fromStation, toStation});
-};
-
-const getTrainsWorkForNow = async now => {
-    const toStation = 4600; //tel aviv shalom
-    const fromStation = 2100; //haifa merkaz ha shmona
-
-    return getTrainsForNow(now, {fromStation, toStation});
-};
-
-module.exports = { getRawDataFromApi, getTrainsHomeForNow, getTrainsWorkForNow, getAllStations, getTrainsForNow };
+module.exports = { getRawDataFromApi, getAllStations, getTrainsForNow };

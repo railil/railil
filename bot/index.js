@@ -18,7 +18,7 @@ const getTrainsWorkForNow = async now => {
     return api.getTrainsForNow(now, user.getToWorkStations());
 };
 
-// Matches "/echo [whatever]"
+// Matches "/домой"
 bot.onText(/домой/i, async (msg) => {
     const chatId = msg.chat.id;
 
@@ -39,7 +39,7 @@ bot.onText(/домой/i, async (msg) => {
     }
 });
 
-// Matches "/echo [whatever]"
+// Matches "/работать"
 bot.onText(/работать/i, async (msg) => {
     const chatId = msg.chat.id;
 
