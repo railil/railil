@@ -3,12 +3,14 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const api = require('../api/');
 const user = require('../user/');
-
-// replace the value below with the Telegram token you receive from @BotFather
+const url = `https://${process.env.PUBLIC_URL}`;
 const token = process.env.BOT_TOKEN;
+const isProduction = process.env.NODE_ENV === "production";
+const bot = new TelegramBot(token, !isProduction ? {polling: true} : {});
 
-// Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, { polling: true });
+if(isProduction){
+    bot.setWebHook(`${url}/bot${token}`);
+}
 
 const getTrainsHomeForNow = async now => {
     return api.getTrainsForNow(now, user.getToHomeStations());
@@ -60,11 +62,4 @@ bot.onText(/работать/i, async (msg) => {
     }
 });
 
-// Listen for any kind of message. There are different kinds of
-// messages.
-bot.on('message', (msg) => {
-    const chatId = msg.chat.id;
-
-    // send a message to the chat acknowledging receipt of their message
-    bot.sendMessage(chatId, 'Received your message');
-});
+module.exports = {bot};
