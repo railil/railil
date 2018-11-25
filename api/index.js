@@ -7,7 +7,7 @@ const axios = require('axios');
 const moment = require('moment');
 
 const getTrainsUrl = ({ fromStation, toStation, date, time }) => `https://www.rail.co.il/apiinfo/api/Plan/GetRoutes?OId=${fromStation}&TId=${toStation}&Date=${date}&Hour=${time}`;
-const getAllStationsUrl = 'https://www.rail.co.il/apiinfo/api/translator/get?lang=ru';
+const allStationsUrl = 'https://www.rail.co.il/apiinfo/api/translator/get?lang=ru';
 
 let allStations;
 /*
@@ -18,25 +18,22 @@ Example:
 {fromStation:4600,toStation:2100,date:20181108,time:1700}
  */
 const getRawDataFromApi = async ({ fromStation, toStation, date, time }) => {
-    try {
-        const { data } = await axios.get(getTrainsUrl({ fromStation, toStation, date, time }));
-        return data;
-    } catch (e) {
-        throw e;
-    }
+    const { data } = await axios.get(getTrainsUrl({ fromStation, toStation, date, time }));
+    return data;
 };
 
 const apiDateTimeToMoment = apiDateTime => {
     return moment(apiDateTime, 'DD/MM/YYYY HH:mm:ss');
 };
 
+//todo add mocks
 const getAllStations = async () => {
     if (allStations) {
         return allStations;
     }
 
     try {
-        const {data} = await axios.get(getAllStationsUrl);
+        const {data} = await axios.get(allStationsUrl);
 
         allStations = data.station;
 
