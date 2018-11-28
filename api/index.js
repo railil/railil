@@ -48,6 +48,7 @@ const getTrainsByDate = async (rawDate, {fromStation, toStation}) => {
     const moment_date = moment(rawDate);
     const date = moment_date.format('YYYYMMDD');//20181108;
     const time = moment_date.format('HHmm');//1700;
+
     try {
         const { Data: { Routes } } = await getRawDataFromApi({ fromStation, toStation, date, time });
         const filtered = Routes.filter(route => {
