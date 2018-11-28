@@ -44,8 +44,8 @@ const getAllStations = async () => {
     return allStations;
 };
 
-const getTrainsForNow = async (now, {fromStation, toStation}) => {
-    const moment_date = moment(now);
+const getTrainsByDate = async (rawDate, {fromStation, toStation}) => {
+    const moment_date = moment(rawDate);
     const date = moment_date.format('YYYYMMDD');//20181108;
     const time = moment_date.format('HHmm');//1700;
     try {
@@ -61,4 +61,4 @@ const getTrainsForNow = async (now, {fromStation, toStation}) => {
     }
 };
 
-module.exports = { getRawDataFromApi, getAllStations, getTrainsForNow };
+module.exports = { getRawDataFromApi, getAllStations, getTrainsByDate };
