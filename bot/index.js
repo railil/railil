@@ -4,6 +4,7 @@ const DEST_TYPES = {
     WORK: 'work',
     HOME: 'home'
 };
+const TIME_REGEXP = /в ([0-9]{2})[:.]([0-9]{2})/gi;
 
 const TelegramBot = require('node-telegram-bot-api');
 const api = require('../api/');
@@ -25,35 +26,43 @@ const getTrainsWork = async date => {
     return api.getTrainsByDate(date, user.getToWorkStations());
 };
 
-async function defaultListResponse(type, msg) {
-    const chatId = msg.chat.id;
+const defaultListResponse = (type) => {
+    return async (msg) => {
+        const chatId = msg.chat.id;
+        const allStations = await api.getAllStations();
+        const date = new Date();
+        const timeExecutor = TIME_REGEXP.exec(msg.text);
+        const [, hour, min] = Array.isArray(timeExecutor) ? timeExecutor : [];
 
-    bot.sendMessage(chatId, 'Работаю...');
+        let trains, userStationsGetter;
 
-    const now = Date.now();
-    let trains, userStationsGetter;
+        bot.sendMessage(chatId, 'Работаю...');
 
-    switch (type) {
-        case DEST_TYPES.HOME:
-            trains = await getTrainsHome(now);
-            userStationsGetter = user.getToHomeStations;
-            break;
-        case DEST_TYPES.WORK:
-            trains = await getTrainsWork(now);
-            userStationsGetter = user.getToWorkStations;
-            break;
-        default:
-            bot.sendMessage(chatId, 'В жизни что-то не получилось :(');
-            return;
-    }
-    const allStations = await api.getAllStations();
-    const { fromStation, toStation } = userStationsGetter();
+        if (hour && min) {
+            date.setHours(hour, min);
+        }
 
-    if (trains.length > 0) {
-        bot.sendMessage(chatId, formatListResponse(trains, allStations, fromStation, toStation));
-    } else {
-        bot.sendMessage(chatId, 'Чет не нашел ничего :(');
-    }
+        switch (type) {
+            case DEST_TYPES.HOME:
+                trains = await getTrainsHome(date.valueOf());
+                userStationsGetter = user.getToHomeStations;
+                break;
+            case DEST_TYPES.WORK:
+                trains = await getTrainsWork(date.valueOf());
+                userStationsGetter = user.getToWorkStations;
+                break;
+            default:
+                bot.sendMessage(chatId, 'В жизни что-то не получилось :(');
+                return;
+        }
+        const { fromStation, toStation } = userStationsGetter();
+
+        if (trains.length > 0) {
+            bot.sendMessage(chatId, formatListResponse(trains, allStations, fromStation, toStation));
+        } else {
+            bot.sendMessage(chatId, 'Чет не нашел ничего :(');
+        }
+    };
 }
 
 function formatListResponse(trains, stations, fromStation, toStation) {
@@ -63,9 +72,9 @@ function formatListResponse(trains, stations, fromStation, toStation) {
 }
 
 // Matches "/домой"
-bot.onText(/домой/i, defaultListResponse.bind(null, DEST_TYPES.HOME));
+bot.onText(/домой/i, defaultListResponse(DEST_TYPES.HOME));
 
 // Matches "/работать"
-bot.onText(/работать/i, defaultListResponse.bind(null, DEST_TYPES.WORK));
+bot.onText(/работать/i, defaultListResponse(DEST_TYPES.WORK));
 
 module.exports = {bot};
