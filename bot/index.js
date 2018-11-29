@@ -4,7 +4,7 @@ const DEST_TYPES = {
     WORK: 'work',
     HOME: 'home'
 };
-const TIME_REGEXP = /в ([0-9]{2})[:.]([0-9]{2})/gi;
+const TIME_REGEXP = /в ([0-9]{2})[:.]([0-9]{2})/i;
 
 const TelegramBot = require('node-telegram-bot-api');
 const api = require('../api/');
