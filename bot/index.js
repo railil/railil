@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+const DEST_TYPES = {
+    WORK: 'work',
+    HOME: 'home'
+};
+
 const TelegramBot = require('node-telegram-bot-api');
 const api = require('../api/');
 const user = require('../user/');
@@ -12,54 +17,55 @@ if(isProduction){
     bot.setWebHook(`${url}/bot${token}`);
 }
 
-const getTrainsHomeForNow = async now => {
-    return api.getTrainsForNow(now, user.getToHomeStations());
+const getTrainsHome = async date => {
+    return api.getTrainsByDate(date, user.getToHomeStations());
 };
 
-const getTrainsWorkForNow = async now => {
-    return api.getTrainsForNow(now, user.getToWorkStations());
+const getTrainsWork = async date => {
+    return api.getTrainsByDate(date, user.getToWorkStations());
 };
+
+async function defaultListResponse(type, msg) {
+    const chatId = msg.chat.id;
+
+    bot.sendMessage(chatId, 'Работаю...');
+
+    const now = Date.now();
+    let trains, userStationsGetter;
+
+    switch (type) {
+        case DEST_TYPES.HOME:
+            trains = await getTrainsHome(now);
+            userStationsGetter = user.getToHomeStations;
+            break;
+        case DEST_TYPES.WORK:
+            trains = await getTrainsWork(now);
+            userStationsGetter = user.getToWorkStations;
+            break;
+        default:
+            bot.sendMessage(chatId, 'В жизни что-то не получилось :(');
+            return;
+    }
+    const allStations = await api.getAllStations();
+    const { fromStation, toStation } = userStationsGetter();
+
+    if (trains.length > 0) {
+        bot.sendMessage(chatId, formatListResponse(trains, allStations, fromStation, toStation));
+    } else {
+        bot.sendMessage(chatId, 'Чет не нашел ничего :(');
+    }
+}
+
+function formatListResponse(trains, stations, fromStation, toStation) {
+    return (stations && `из ${stations[fromStation]} в ${stations[toStation]}`) +
+        '\n' +
+        `* ${trains.splice(0, 5).join('\n* ')}`;
+}
 
 // Matches "/домой"
-bot.onText(/домой/i, async (msg) => {
-    const chatId = msg.chat.id;
-
-    bot.sendMessage(chatId, 'Работаю...');
-
-    const trains = await getTrainsHomeForNow(Date.now());
-    const allStations = await api.getAllStations();
-
-    const { fromStation, toStation } = user.getToHomeStations();
-
-    if (trains.length > 0) {
-        bot.sendMessage(chatId,
-            (allStations && `из ${allStations[fromStation]} в ${allStations[toStation]}`) +
-            '\n' +
-            `* ${trains.splice(0, 5).join('\n* ')}`);
-    } else {
-        bot.sendMessage(chatId, 'Чет не нашел ничего :(');
-    }
-});
+bot.onText(/домой/i, defaultListResponse.bind(null, DEST_TYPES.HOME));
 
 // Matches "/работать"
-bot.onText(/работать/i, async (msg) => {
-    const chatId = msg.chat.id;
-
-    bot.sendMessage(chatId, 'Работаю...');
-
-    const trains = await getTrainsWorkForNow(Date.now());
-    const allStations = await api.getAllStations();
-
-    const { fromStation, toStation } = user.getToWorkStations();
-
-    if (trains.length > 0) {
-        bot.sendMessage(chatId,
-            (allStations && `из ${allStations[fromStation]} в ${allStations[toStation]}`) +
-            '\n' +
-            `* ${trains.splice(0, 5).join('\n* ')}`);
-    } else {
-        bot.sendMessage(chatId, 'Чет не нашел ничего :(');
-    }
-});
+bot.onText(/работать/i, defaultListResponse.bind(null, DEST_TYPES.WORK));
 
 module.exports = {bot};
