@@ -2,10 +2,6 @@
 
 ## Install
 
-1
-`npm install`
-
-2
-`$ cp .env.example .env`
-
-3 Put correct creds there
+1. `npm install`
+1. `$ cp .env.example .env`
+1. Put correct creds there
