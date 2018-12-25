@@ -53,7 +53,7 @@ const getTrainsByDate = async (rawDate, {fromStation, toStation}) => {
         const { Data: { Routes } } = await getRawDataFromApi({ fromStation, toStation, date, time });
         const filtered = Routes.filter(route => {
             const departureMoment = apiDateTimeToMoment(route.Train[0].DepartureTime);
-            return departureMoment.isAfter(moment_date);
+            return departureMoment.isSameOrAfter(moment_date, 'minute');
         });
 
         return filtered.map(route => route.Train[0].DepartureTime);
