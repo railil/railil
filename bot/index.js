@@ -18,6 +18,11 @@ if(isProduction){
     bot.setWebHook(`${url}/bot${token}`);
 }
 
+const sendMessage = (chat_id, text, params) => {
+    const _params = {parse_mode:"Markdown",...params};
+    bot.sendMessage(chat_id, text, _params);
+}
+
 const getTrainsHome = async date => {
     return api.getTrainsByDate(date, user.getToHomeStations());
 };
@@ -36,7 +41,7 @@ const defaultListResponse = (type) => {
 
         let trains, userStationsGetter;
 
-        bot.sendMessage(chatId, 'Работаю...');
+        await sendMessage(chatId, 'Работаю...');
 
         if (hour && min) {
             date.setHours(hour, min);
@@ -52,23 +57,24 @@ const defaultListResponse = (type) => {
                 userStationsGetter = user.getToWorkStations;
                 break;
             default:
-                bot.sendMessage(chatId, 'В жизни что-то не получилось :(');
+                sendMessage(chatId, 'В жизни что-то не получилось :(');
                 return;
         }
         const { fromStation, toStation } = userStationsGetter();
 
         if (trains.length > 0) {
-            bot.sendMessage(chatId, formatListResponse(trains, allStations, fromStation, toStation));
+            sendMessage(chatId, formatListResponse(trains, allStations, fromStation, toStation));
         } else {
-            bot.sendMessage(chatId, 'Чет не нашел ничего :(');
+            sendMessage(chatId, 'Чет не нашел ничего :(');
         }
     };
 }
 
 function formatListResponse(trains, stations, fromStation, toStation) {
-    return (stations && `из ${stations[fromStation]} в ${stations[toStation]}`) +
+    const separator = '・';
+    return (stations && `🚂 *${stations[fromStation]}* ➡️ *${stations[toStation]}*`) +
         '\n' +
-        `* ${trains.splice(0, 5).join('\n* ')}`;
+        `${separator} ${trains.splice(0, 5).map( train => `*${train.split(' ')[0]}* _${train.split(' ')[1]}_`).join(`\n${separator} `)}`;
 }
 
 // Matches "/домой"
