@@ -72,9 +72,18 @@ const defaultListResponse = (type) => {
 
 function formatListResponse(trains, stations, fromStation, toStation) {
     const separator = '・';
-    return (stations && `🚂 *${stations[fromStation]}* ➡️ *${stations[toStation]}*`) +
-        '\n' +
-        `${separator} ${trains.splice(0, 5).map( train => `*${train.split(' ')[0]}* _${train.split(' ')[1]}_`).join(`\n${separator} `)}`;
+    const format = 'HH:mm';
+    let response = [];
+
+    stations && response.push(`🚂 *${stations[fromStation]}* ➡️ *${stations[toStation]}*\n`);
+    trains.splice(0, 5).forEach(train => {
+       const {hasReservedSeat, departure, arrival, trainNumber, delay, load} = train;
+       const delayOutput = delay ? `💢${delay}` : '';
+       const loadOutput = load > 0.5 ? '👺' : '‍';
+       const reservedSeatOutput =  hasReservedSeat ? '🎟' : '';
+       response.push(`${separator} _#${trainNumber}:_ 🛫${departure.format(format)} 🛬${arrival.format(format)} ${delayOutput} ${loadOutput} ${reservedSeatOutput}\n`);
+    });
+    return response.join('');
 }
 
 // Matches "/домой"
