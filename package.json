@@ -2,11 +2,13 @@
   "name": "railil",
   "version": "1.0.0",
   "description": "",
-  "main": "bot/index.js",
+  "main": "build/bot/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon",
-    "start": "node ./bot/index.js"
+    "build": "flow-remove-types src/ -d build/ --all --pretty",
+    "flow:deps": "flow-typed install",
+    "dev": "npm run flow:deps && watch --wait=1 'flow-remove-types src/ -d build/ --all --pretty' ./src/ & nodemon ./build/bot/index.js",
+    "start": "node ./build/bot/index.js"
   },
   "repository": {
     "type": "git",
@@ -40,10 +42,16 @@
     "pg": "^7.6.1"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
     "eslint": "^5.9.0",
     "eslint-config-pedant": "^1.0.1",
+    "eslint-plugin-flowtype": "^3.2.1",
+    "flow-bin": "^0.92.1",
+    "flow-remove-types": "^1.2.3",
+    "flow-typed": "^2.5.1",
     "husky": "^1.1.3",
     "lint-staged": "^8.0.4",
-    "nodemon": "^1.18.7"
+    "nodemon": "^1.18.7",
+    "watch": "^1.0.2"
   }
 }

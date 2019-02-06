@@ -2,7 +2,7 @@ require('dotenv').config();
 const port = process.env.PORT;
 const token = process.env.BOT_TOKEN;
 
-const {bot} = require('./bot');
+const {bot} = require('./src/bot');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');

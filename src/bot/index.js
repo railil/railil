@@ -7,8 +7,8 @@ const DEST_TYPES = {
 const TIME_REGEXP = /в ([0-9]{2})[:.]([0-9]{2})/i;
 
 const TelegramBot = require('node-telegram-bot-api');
-const api = require('../api/');
-const user = require('../user/');
+const api = require('../api');
+const user = require('../user');
 const url = `https://${process.env.PUBLIC_URL}`;
 const token = process.env.BOT_TOKEN;
 const isProduction = process.env.NODE_ENV === "production";

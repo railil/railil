@@ -1,6 +1,6 @@
 //TODO move api ids to StationService
 
-const db = require('../db');
+const db = require('../../db');
 
 //todo: don't mind this method. This is to check that DB connection works
 const getUserPreferences = () => {
