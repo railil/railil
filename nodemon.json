@@ -1,4 +1,4 @@
 {
   "verbose": true,
-  "ignore": ["node_modules"]
+  "watch": ["build/", "server.js"]
 }
