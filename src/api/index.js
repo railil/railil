@@ -25,6 +25,52 @@ const getRawDataFromApi = async ({ fromStation, toStation, date, time }) => {
 const apiDateTimeToMoment = apiDateTime => {
     return moment(apiDateTime, 'DD/MM/YYYY HH:mm:ss');
 };
+/*
+    MVP Train object implementation
+ */
+const getTrainObjectsFromApi = async params => {
+    try{
+        const { Data: { Routes, Delays, Omasim}} = await getRawDataFromApi(params);
+        return Routes.map(route => {
+            const {Trainno, DepartureTime, ArrivalTime, ReservedSeat} = route.Train[0];
+            // General Train data
+            const trainNumber = parseInt(Trainno);
+            const departure = apiDateTimeToMoment(DepartureTime);
+            const arrival = apiDateTimeToMoment(ArrivalTime);
+            const hasReservedSeat = ReservedSeat;
+
+            // Getting delay for train
+            const _delay = Delays.find(d => parseInt(d.Train) === trainNumber && d.Station === params.fromStation);
+            const delay = _delay ? _delay.Min : null;
+
+            // Getting load for train
+            const _loadTrain = Omasim.find(o => o.TrainNumber === trainNumber);
+            let load = null;
+            if( _loadTrain ){
+                const _loadStation = _loadTrain.Stations.find(s =>
+                    s.StationNumber === parseInt(params.fromStation)
+                    && s.Time === departure.format('HH:mm')
+                );
+                if( _loadStation ) {
+                    load = _loadStation.OmesPercent;
+                }
+            }
+
+            // Constructing output
+            return {
+                hasReservedSeat,
+                departure,
+                arrival,
+                trainNumber,
+                delay,
+                load
+            }
+        });
+    }catch (e) {
+        console.log(e);
+        return []
+    }
+};
 
 //todo add mocks
 const getAllStations = async () => {
@@ -50,16 +96,16 @@ const getTrainsByDate = async (rawDate, {fromStation, toStation}) => {
     const time = moment_date.format('HHmm');//1700;
 
     try {
-        const { Data: { Routes } } = await getRawDataFromApi({ fromStation, toStation, date, time });
-        const filtered = Routes.filter(route => {
-            const departureMoment = apiDateTimeToMoment(route.Train[0].DepartureTime);
-            return departureMoment.isSameOrAfter(moment_date, 'minute');
+        const trainObjects = await getTrainObjectsFromApi({ fromStation, toStation, date, time });
+        const filtered = trainObjects.filter(trainObject => {
+            const {departure} = trainObject;
+            return departure.isSameOrAfter(moment_date, 'minute');
         });
 
-        return filtered.map(route => route.Train[0].DepartureTime);
+        return filtered;
     } catch (e) {
         return [];
     }
 };
 
-module.exports = { getRawDataFromApi, getAllStations, getTrainsByDate };
+module.exports = { getRawDataFromApi, getAllStations, getTrainsByDate, getTrainObjectFromApi: getTrainObjectsFromApi };
