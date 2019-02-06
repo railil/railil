@@ -20,8 +20,8 @@ if(isProduction){
 
 const sendMessage = (chat_id, text, params) => {
     const _params = {parse_mode:"Markdown",...params};
-    bot.sendMessage(chat_id, text, _params);
-}
+    return bot.sendMessage(chat_id, text, _params);
+};
 
 const getTrainsHome = async date => {
     return api.getTrainsByDate(date, user.getToHomeStations());
@@ -29,6 +29,22 @@ const getTrainsHome = async date => {
 
 const getTrainsWork = async date => {
     return api.getTrainsByDate(date, user.getToWorkStations());
+};
+
+const formatListResponse = (trains, stations, fromStation, toStation) => {
+    const separator = '・';
+    const format = 'HH:mm';
+    let response = [];
+
+    stations && response.push(`🚂 *${stations[fromStation]}* ➡️ *${stations[toStation]}*\n`);
+    trains.splice(0, 5).forEach(train => {
+        const {hasReservedSeat, departure, arrival, trainNumber, delay, load} = train;
+        const delayOutput = delay ? `💢${delay}` : '';
+        const loadOutput = load > 0.5 ? '👺' : '‍';
+        const reservedSeatOutput =  hasReservedSeat ? '🎟' : '';
+        response.push(`${separator} _#${trainNumber}:_ 🛫${departure.format(format)} 🛬${arrival.format(format)} ${delayOutput} ${loadOutput} ${reservedSeatOutput}\n`);
+    });
+    return response.join('');
 };
 
 const defaultListResponse = (type) => {
@@ -41,7 +57,7 @@ const defaultListResponse = (type) => {
 
         let trains, userStationsGetter;
 
-        await sendMessage(chatId, 'Работаю...');
+        const {message_id} = await sendMessage(chatId, 'Работаю...');
 
         if (hour && min) {
             date.setHours(hour, min);
@@ -67,23 +83,8 @@ const defaultListResponse = (type) => {
         } else {
             sendMessage(chatId, 'Чет не нашел ничего :(');
         }
+        bot.deleteMessage(chatId, message_id);
     };
-}
-
-function formatListResponse(trains, stations, fromStation, toStation) {
-    const separator = '・';
-    const format = 'HH:mm';
-    let response = [];
-
-    stations && response.push(`🚂 *${stations[fromStation]}* ➡️ *${stations[toStation]}*\n`);
-    trains.splice(0, 5).forEach(train => {
-       const {hasReservedSeat, departure, arrival, trainNumber, delay, load} = train;
-       const delayOutput = delay ? `💢${delay}` : '';
-       const loadOutput = load > 0.5 ? '👺' : '‍';
-       const reservedSeatOutput =  hasReservedSeat ? '🎟' : '';
-       response.push(`${separator} _#${trainNumber}:_ 🛫${departure.format(format)} 🛬${arrival.format(format)} ${delayOutput} ${loadOutput} ${reservedSeatOutput}\n`);
-    });
-    return response.join('');
 }
 
 // Matches "/домой"
