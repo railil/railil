@@ -39,6 +39,7 @@
     "knex": "^0.15.2",
     "moment": "^2.22.2",
     "node-telegram-bot-api": "^0.30.0",
+    "node-telegram-keyboard-wrapper": "^2.0.1",
     "pg": "^7.6.1"
   },
   "devDependencies": {
