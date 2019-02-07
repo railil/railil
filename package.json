@@ -2,13 +2,13 @@
   "name": "railil",
   "version": "1.0.0",
   "description": "",
-  "main": "build/bot/index.js",
+  "main": "build/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "flow-remove-types src/ -d build/ --all --pretty",
     "flow:deps": "flow-typed install",
     "dev": "npm run flow:deps && watch --wait=1 'flow-remove-types src/ -d build/ --all --pretty' ./src/ & nodemon ./build/bot/index.js",
-    "start": "node ./build/bot/index.js"
+    "start": "node ./build/server.js"
   },
   "repository": {
     "type": "git",
