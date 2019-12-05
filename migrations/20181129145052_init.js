@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
     return Promise.all([
         knex.schema.createTable('user_preferences', function(table) {
             table.increments('user_preferences_id').primary();
@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
     ]);
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
     return Promise.all([
         knex.schema.dropTable('user_preferences'),
     ])
